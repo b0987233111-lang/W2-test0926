@@ -17,22 +17,33 @@
         <label><input type="radio" name="topic" value="條件判斷"> 條件判斷</label>
         <label><input type="radio" name="topic" value="迴圈"> 迴圈</label>
         <label><input type="radio" name="topic" value="串列"> 串列</label>
-        <button type="submit" name="action" value="generate">幫我出題</button>
+        <button type="submit" class="min-btn" name="action" value="generate">幫我出題</button>
     </form>
 
-    <h2>AI 出題：</h2>
-    <p>{{ question_text }}</p>
+    <div class="question_ai">
+        <h3>AI 出題：</h3>
+        <p>{{ question_text }}</p>
 
-    <!-- 檢查答案的表單（帶有隱藏的主題欄位） -->
-    <form method="POST">
-        <input type="hidden" name="topic" value="{{ topic }}">
-        <h2>請輸入您的回答或程式碼：</h2>
-        <input type="text" name="student_answer" placeholder="請在此輸入答案">
-        <button type="submit" name="action" value="check">送出答案</button>
-    </form>
+        <!-- 當選擇「輸入輸出」時才顯示作答選項 -->
+        {% if topic == "輸入輸出" %}
+        <form method="POST">
+            <input type="hidden" name="topic" value="{{ topic }}">
+            <label><input type="radio" name="student_answer" value="A"> A. input()</label>
+            <label><input type="radio" name="student_answer" value="B"> B. print()</label>
+            <label><input type="radio" name="student_answer" value="C"> C. len()</label>
+            <label><input type="radio" name="student_answer" value="D"> D. range()</label>
+            <button type="submit" class="min-btn" name="action" value="check">提交答案</button>
+        </form>
+        {% endif %}
+    </div>
 
-    <h2>AI 回饋：</h2>
-    <p>{{ feedback }}</p>
+    <!-- 顯示作答回饋 -->
+    {% if feedback %}
+    <div class="feedback">
+        <h3>AI 回饋：</h3>
+        <p>{{ feedback }}</p>
+    </div>
+    {% endif %}
 
 </body>
 </html>
