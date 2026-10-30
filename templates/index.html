@@ -8,40 +8,45 @@
 <body>
 
     <h1>AI 程式練習助手</h1>
-    <p>這是一個用於練習程式設計的 AI 助手。請在下方輸入您的程式碼，並點擊「執行」按鈕來查看結果。</p>
+    <p>這是一個用於練習程式設計的 AI 助手。請在下方選擇主題，並點擊按鈕來進行測驗。</p>
 
-    <!-- 選擇主題的表單 -->
+    <!-- 統一使用同一個大 form，避免巢狀表單衝突 -->
     <form method="POST">
         <h2>請輸入選擇的學習主題：</h2>
-        <label><input type="radio" name="topic" value="輸入輸出"> 輸入輸出</label>
-        <label><input type="radio" name="topic" value="條件判斷"> 條件判斷</label>
-        <label><input type="radio" name="topic" value="迴圈"> 迴圈</label>
-        <label><input type="radio" name="topic" value="串列"> 串列</label>
+        <label><input type="radio" name="topic" value="輸入輸出" {% if request.form.get('topic') == '輸入輸出' %}checked{% endif %}> 輸入輸出</label>
+        <label><input type="radio" name="topic" value="條件判斷" {% if request.form.get('topic') == '條件判斷' %}checked{% endif %}> 條件判斷</label>
+        <label><input type="radio" name="topic" value="迴圈" {% if request.form.get('topic') == '迴圈' %}checked{% endif %}> 迴圈</label>
+        <label><input type="radio" name="topic" value="串列" {% if request.form.get('topic') == '串列' %}checked{% endif %}> 串列</label>
+        <br><br>
         <button type="submit" class="min-btn" name="action" value="generate">幫我出題</button>
+
+        <!-- 當有 AI 產生的題目資料時才顯示題目與選項 -->
+        {% if question_data %}
+        <div class="question_ai" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 15px;">
+            <h3>AI 出題：</h3>
+            <p>{{ question_data.question }}</p>
+
+            <label><input type="radio" name="student_answer" value="A"> A. {{ question_data.option1 }}</label><br>
+            <label><input type="radio" name="student_answer" value="B"> B. {{ question_data.option2 }}</label><br>
+            <label><input type="radio" name="student_answer" value="C"> C. {{ question_data.option3 }}</label><br>
+            <label><input type="radio" name="student_answer" value="D"> D. {{ question_data.option4 }}</label><br><br>
+            
+            <button type="submit" class="min-btn" name="action" value="check">提交答案</button>
+        </div>
+        {% endif %}
     </form>
 
-    <div class="question_ai">
-        <h3>AI 出題：</h3>
-        <p>{{ question_text }}</p>
-
-        <!-- 當選擇「輸入輸出」時才顯示作答選項 -->
-        {% if topic == "輸入輸出" %}
-        <form method="POST">
-            <input type="hidden" name="topic" value="{{ topic }}">
-            <label><input type="radio" name="student_answer" value="A"> A. input()</label>
-            <label><input type="radio" name="student_answer" value="B"> B. print()</label>
-            <label><input type="radio" name="student_answer" value="C"> C. len()</label>
-            <label><input type="radio" name="student_answer" value="D"> D. range()</label>
-            <button type="submit" class="min-btn" name="action" value="check">提交答案</button>
-        </form>
-        {% endif %}
-    </div>
-
     <!-- 顯示作答回饋 -->
-    {% if feedback %}
-    <div class="feedback">
+    {% if selected_answer %}
+    <div class="feedback" style="margin-top: 20px;">
         <h3>AI 回饋：</h3>
-        <p>{{ feedback }}</p>
+        {% if is_correct %}
+            <p style="color: green;">答對了！🎉</p>
+        {% else %}
+            <p style="color: red;">答錯囉～ 😢</p>
+        {% endif %}
+        <p><strong>正確答案：</strong>{{ question_data.answer }}</p>
+        <p><strong>解析：</strong>{{ question_data.explanation }}</p>
     </div>
     {% endif %}
 
